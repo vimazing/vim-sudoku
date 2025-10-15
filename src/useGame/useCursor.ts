@@ -30,6 +30,40 @@ export function useCursor(rendererManager: UseRenderer) {
     setTimeout(() => el.classList.remove("locked-cell"), 300);
   }, [cursor, getCellEl]);
 
+  const flashValid = useCallback(() => {
+    const el = getCellEl(cursor.r, cursor.c);
+    if (!el) return;
+    el.classList.add("valid-move");
+    setTimeout(() => el.classList.remove("valid-move"), 300);
+  }, [cursor, getCellEl]);
+
+  const highlightConflicts = useCallback((conflictIndices: number[]) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const sudokuDiv = container.querySelector("#sudoku");
+    if (!sudokuDiv) return;
+
+    conflictIndices.forEach((idx) => {
+      const r = Math.floor(idx / 9);
+      const c = idx % 9;
+      const el = getCellEl(r, c);
+      if (el) {
+        el.classList.add("conflict");
+      }
+    });
+
+    setTimeout(() => {
+      conflictIndices.forEach((idx) => {
+        const r = Math.floor(idx / 9);
+        const c = idx % 9;
+        const el = getCellEl(r, c);
+        if (el) {
+          el.classList.remove("conflict");
+        }
+      });
+    }, 2000);
+  }, [containerRef, getCellEl]);
+
   const moveCursor = useCallback(
     (dr: number, dc: number, steps = 1) => {
       if (animatingRef.current) return;
@@ -54,9 +88,25 @@ export function useCursor(rendererManager: UseRenderer) {
 
   useEffect(() => {
     const onLockedCell = () => flashLocked();
+    const onValidMove = () => flashValid();
+    const onInvalidMove = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.conflicts) {
+        highlightConflicts(detail.conflicts);
+      }
+      flashInvalid();
+    };
+
     window.addEventListener("sudoku-locked-cell", onLockedCell);
-    return () => window.removeEventListener("sudoku-locked-cell", onLockedCell);
-  }, [flashLocked]);
+    window.addEventListener("sudoku-valid-move", onValidMove);
+    window.addEventListener("sudoku-invalid-move", onInvalidMove as EventListener);
+
+    return () => {
+      window.removeEventListener("sudoku-locked-cell", onLockedCell);
+      window.removeEventListener("sudoku-valid-move", onValidMove);
+      window.removeEventListener("sudoku-invalid-move", onInvalidMove as EventListener);
+    };
+  }, [flashLocked, flashValid, flashInvalid, highlightConflicts]);
 
   return {
     cursor,
@@ -64,6 +114,8 @@ export function useCursor(rendererManager: UseRenderer) {
     moveCursor,
     getCellEl,
     flashInvalid,
+    flashValid,
+    highlightConflicts,
   };
 }
 

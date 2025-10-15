@@ -1,6 +1,6 @@
 # @vimazing/vim-sudoku
 
-Lightweight, typed **React hooks** and utilities for building interactive sudoku games with VIM-inspired controls.
+Lightweight, typed **React hooks** and utilities for building interactive sudoku games with **VIM-style modal editing**.
 
 Part of the [VIMazing](https://github.com/andrepadez/vimazing-vimaze) project.
 
@@ -10,8 +10,9 @@ Part of the [VIMazing](https://github.com/andrepadez/vimazing-vimaze) project.
 - [Features](#features)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [VIM Modal Editing](#vim-modal-editing)
 - [Core Hooks](#core-hooks)
-- [Utilities](#utilities)
+- [Game Mechanics](#game-mechanics)
 - [Example App](#example-app)
 - [Build & Release](#build--release)
 - [License](#license)
@@ -19,11 +20,15 @@ Part of the [VIMazing](https://github.com/andrepadez/vimazing-vimaze) project.
 ---
 
 ## Features
-- **Drop-in hooks** for sudoku game logic, player control, scoring, and key logging.
-- **Typed API** with generated declaration files for editor IntelliSense.
-- **VIM-style navigation** (`h`, `j`, `k`, `l`, counts, `i` to start, etc.).
-- **Composable architecture** – bring your own rendering and platform-specific bindings.
-- **Tree-shakeable exports** to keep bundles lean.
+- 🎮 **VIM modal editing** – Navigate in normal mode, edit cells in insert mode (R/C to enter)
+- ⌨️ **Full VIM motions** – `h`/`j`/`k`/`l`, counted moves, `^`/`$`/`0` for row navigation
+- 🎯 **Smart cell locking** – Pre-filled clues are protected with visual feedback
+- ⏱️ **Time & keystroke limits** – Configurable game-over conditions
+- 📊 **Built-in scoring** – Time-based scoring with keystroke tracking
+- 🎨 **Tokyo Night theme** – Beautiful dark theme with 3x3 box separators
+- 📦 **Typed API** – Full TypeScript support with generated declarations
+- 🪝 **Composable hooks** – Separate concerns for game state, rendering, input, and scoring
+- 🌲 **Tree-shakeable exports** – Import only what you need
 
 ---
 
@@ -46,65 +51,187 @@ bun add @vimazing/vim-sudoku
 ## Quick Start
 
 ```tsx
-import { useEffect } from "react";
 import { useGame } from "@vimazing/vim-sudoku";
+import "@vimazing/vim-sudoku/sudoku.css";
 
 export function SudokuGame() {
-  const { containerRef, gameStatus, startGame } = useGame();
-
-  useEffect(() => {
-    startGame();
-  }, [startGame]);
+  const { containerRef, initGame, gameStatus, scoreManager } = useGame();
 
   return (
-    <section className="mx-auto w-fit space-y-4">
-      <h1 className="text-2xl font-bold">VIMazing Sudoku</h1>
-      <div ref={containerRef} className="relative" />
-      {gameStatus === "game-won" && <p>🎉 You solved it!</p>}
-    </section>
+    <div>
+      <h1>VIMazing Sudoku</h1>
+      <button onClick={initGame}>New Puzzle</button>
+      
+      <div className="relative w-fit">
+        <div ref={containerRef} />
+      </div>
+      
+      {gameStatus === "game-won" && (
+        <p>🎉 Score: {scoreManager.finalScore?.toLocaleString()}</p>
+      )}
+    </div>
   );
 }
 ```
 
-Default controls:
+---
 
-| Key                 | Action          |
-| ------------------- | --------------- |
-| `i`                 | Start game      |
-| `h` / `j` / `k` / `l` | Move cursor   |
-| `<number>`          | Enter number    |
-| `x` / `d`           | Clear cell      |
-| `q`                 | Quit game       |
-| `Esc`               | Cancel / pause  |
+## VIM Modal Editing
+
+VIMazing Sudoku follows VIM's modal editing philosophy with strict insert/replace semantics:
+
+### Navigation Mode (default)
+
+#### Movement
+
+| Key | Action | Notes |
+| --- | ------ | ----- |
+| `h` / `j` / `k` / `l` | Move cursor left/down/up/right | Core VIM navigation |
+| `<count>h/j/k/l` | Move with count | e.g., `3j` = down 3, `5l` = right 5 |
+| `0` / `^` | Jump to start of row | Move to column 0 |
+| `$` | Jump to end of row | Move to column 8 |
+| `.` | Repeat last motion | Repeat with optional new count |
+
+#### Editing
+
+| Key | Action | Valid On |
+| --- | ------ | -------- |
+| `I` | Enter insert mode | ✅ Empty cells only |
+| `R` | Enter replace mode | ✅ User-filled cells only |
+| `D` / `X` | Delete cell value | ✅ User-filled cells only |
+
+#### Game Control
+
+| Key | Action |
+| --- | ------ |
+| `Q` | Quit game |
+
+### Edit Mode (I/R to enter)
+
+| Key | Action |
+| --- | ------ |
+| `1-9` | Fill cell with number |
+| `x` / `Backspace` | Clear cell |
+| `Esc` / `Enter` | Exit edit mode back to navigation |
+
+---
+
+## Cell State Rules
+
+Understanding cell states is crucial for VIM-style editing:
+
+| Cell State | `I` (Insert) | `R` (Replace) | `D`/`X` (Delete) | Visual |
+| ---------- | ------------ | ------------- | ---------------- | ------ |
+| **Empty** (`.`) | ✅ Enter edit | 🔴 Flash (use I) | ➖ No effect | Normal |
+| **User-filled** | 🔴 Flash (use R) | ✅ Enter edit | ✅ Delete | Normal |
+| **Pre-filled clue** | 🔴 Flash (locked) | 🔴 Flash (locked) | 🔴 Flash (locked) | Darker text |
+
+### Visual Feedback
+
+- 🔵 **Blue glow** – Navigation mode (current cell)
+- 🟡 **Yellow pulsing glow** – Edit mode (typing active)
+- 🔴 **Red flash** – Invalid action (wrong mode, locked cell, or out of bounds)
+
+### Examples
+
+```
+Empty cell:     Press I → type 5 → Esc
+Replace value:  Press R → type 7 → Esc  
+Delete value:   Press D (instant)
+Move 3 down:    Press 3j
+Jump to end:    Press $
+```
 
 ---
 
 ## Core Hooks
 
-| Hook | Description |
-| ---- | ----------- |
-| `useGame(platformHook?)` | One-stop hook that wires sudoku generation, rendering, player state, scoring, and keyboard bindings. Returns refs, status helpers, and managers you can compose with your UI. |
-| `useKeyBindings()` | Provides VIM-style key bindings, including repeat counts and movement helpers. |
-| `useScore()` | Tracks timers, moves, and final score calculation. |
+### `useGame(platformHook?)`
 
-Each hook is exported individually, so you can cherry-pick only what you need:
+Main hook that orchestrates the entire sudoku game. Returns:
+
+```ts
+{
+  // Core
+  containerRef: RefObject<HTMLDivElement>,
+  gameStatus: GameStatus,  // "waiting" | "started" | "game-won" | "game-over"
+  startGame: () => void,
+  stopGame: () => void,
+  initGame: () => void,    // Reset board + start
+  
+  // Cursor
+  cursor: { r: number; c: number },
+  moveCursor: (dr, dc, steps?) => void,
+  
+  // Board
+  board: string,           // 81-character string
+  initialBoard: string,    // Original clues
+  setDigit: (digit) => void,
+  erase: () => void,
+  reset: () => void,
+  solveBoard: () => void,
+  boardToString: (human?) => string,  // Format board for display
+  
+  // Scoring
+  scoreManager: {
+    timeValue: number,     // Time in milliseconds
+    finalScore: number | null,
+    timeLimit: number,     // 60000ms (60 seconds)
+    keystrokeLimit: number, // 100 keystrokes
+  },
+  
+  // Key logging
+  keyLog: KeyLogEntry[],
+  editMode: "navigation" | "edit",
+}
+```
+
+### Individual Hooks
+
+Export individual hooks for granular control:
 
 ```ts
 import { useScore } from "@vimazing/vim-sudoku/useScore";
+import { useBoardState } from "@vimazing/vim-sudoku/useGame/useBoardState";
 ```
 
 ---
 
-## Utilities
+## Game Mechanics
 
-Besides the hooks, the library exports:
+### Scoring
 
-- `SudokuGenerator` – procedural sudoku puzzle generation class.
-- `SudokuRenderer` – canvas renderer tailored for sudoku grids.
-- `types` – shared TypeScript types such as `GameStatus`, `SudokuCell`, and `KeyLogEntry`.
+Time-based scoring formula:
+```
+score = max(0, 100000 - timeInSeconds × 10)
+```
+
+### Game Over Conditions
+
+- ⏱️ **Time limit**: 60 seconds
+- ⌨️ **Keystroke limit**: 100 keystrokes
+
+Customize in `src/useScore/useScore.ts`:
+```ts
+const TIME_LIMIT_MS = 60000;
+const KEYSTROKE_LIMIT = 100;
+```
+
+### Win Detection
+
+Currently manual (solving via UI or `solveBoard()`). Automatic win detection coming soon!
+
+### Board Format
 
 ```ts
-import { SudokuGenerator, GameStatus } from "@vimazing/vim-sudoku";
+// Computer format (compact)
+boardToString()  // "628.1...535928671..."
+
+// Human format (readable)
+boardToString(true)
+// 6 2 8 | 1 . . | . 5 .
+// 5 3 9 | 2 4 8 | 6 7 1
+// ...
 ```
 
 ---

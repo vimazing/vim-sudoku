@@ -14,7 +14,17 @@ export function useGame(platformHook?: unknown) {
   const gameManager = useGameStatus(rendererManager, cursorManager);
   const { gameStatus, setGameStatus, startGame, stopGame } = gameManager;
   const boardManager = useBoardState(cursorManager);
-  const { board, initialBoard, solution, setDigit, erase, reset, solveBoard } = boardManager;
+  const { 
+    board, 
+    initialBoard, 
+    solution, 
+    setDigit, 
+    erase, 
+    reset, 
+    solveBoard,
+    isComplete,
+    isFullyValid,
+  } = boardManager;
 
   // ---------------------------
   // Keybindings
@@ -37,6 +47,10 @@ export function useGame(platformHook?: unknown) {
   const scoreManager = useScore({
     gameContext: { gameStatus, setGameStatus },
     keystrokeCount: keyLog.length,
+    board,
+    isComplete,
+    isFullyValid,
+    initialBoard,
   });
 
   // ---------------------------

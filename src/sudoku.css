@@ -1,20 +1,27 @@
 /* =========================================================
    🔧 Controls (tweak these)
    ========================================================= */
+/* :root { */
+/*   --cell-size: 32px; */
+/*   --cell-font-size: 16px; */
+/*   --grid-gap: 2px; */
+/*   --box-separator: 3px; */
+/* } */
+
 :root {
-  --cell-size: 32px;
-  --cell-font-size: 16px;
-  --grid-gap: 2px;
-  --box-separator: 3px;
+  --cell-size: 48px;
+  --cell-font-size: 32px;
+  --grid-gap: 4px;
+  --box-separator: 6px;
 }
 
 
-:root {
-  --cell-size: 96px;
-  --cell-font-size: 48px;
-  --grid-gap: 6px;
-  --box-separator: 9px;
-}
+/* :root { */
+/*   --cell-size: 96px; */
+/*   --cell-font-size: 48px; */
+/*   --grid-gap: 6px; */
+/*   --box-separator: 9px; */
+/* } */
 
 /* =========================================================
    Container & Grid Base
@@ -27,7 +34,7 @@
 
 #sudoku {
   position: relative;
-  background-color: #1e2030; /* Tokyo Night card background */
+  background-color: var(--card, #1e2030);
   border-radius: 0.5rem;
   box-shadow: 0 0 10px rgba(27, 29, 43, 0.6), inset 0 0 6px rgba(130, 170, 255, 0.05);
   padding: 0.5rem;
@@ -64,8 +71,8 @@
   border-radius: 4px;
   font-family: "Fira Code", monospace;
   font-size: var(--cell-font-size);
-  background: #2f334d; /* Tokyo Night muted */
-  color: #c8d3f5; /* Tokyo Night foreground */
+  background: var(--muted, #2f334d);
+  color: var(--foreground, #c8d3f5);
   transition: all 0.15s ease;
   box-shadow: inset 0 0 3px rgba(27, 29, 43, 0.4);
 }
@@ -77,35 +84,35 @@
 #sudoku .sudoku-cell[data-c="2"],
 #sudoku .sudoku-cell[data-c="5"],
 #sudoku .sudoku-cell[data-c="8"] {
-  border-right: 2px solid rgba(130, 170, 255, 0.3);
+  border-right: 2px solid color-mix(in srgb, var(--primary, #82aaff) 30%, transparent);
 }
 
 /* Left borders (start of each 3x3 box horizontally) */
 #sudoku .sudoku-cell[data-c="0"],
 #sudoku .sudoku-cell[data-c="3"],
 #sudoku .sudoku-cell[data-c="6"] {
-  border-left: 2px solid rgba(130, 170, 255, 0.3);
+  border-left: 2px solid color-mix(in srgb, var(--primary, #82aaff) 30%, transparent);
 }
 
 /* Bottom borders (end of each 3x3 box vertically) */
 #sudoku .sudoku-cell[data-r="2"],
 #sudoku .sudoku-cell[data-r="5"],
 #sudoku .sudoku-cell[data-r="8"] {
-  border-bottom: 2px solid rgba(130, 170, 255, 0.3);
+  border-bottom: 2px solid color-mix(in srgb, var(--primary, #82aaff) 30%, transparent);
 }
 
 /* Top borders (start of each 3x3 box vertically) */
 #sudoku .sudoku-cell[data-r="0"],
 #sudoku .sudoku-cell[data-r="3"],
 #sudoku .sudoku-cell[data-r="6"] {
-  border-top: 2px solid rgba(130, 170, 255, 0.3);
+  border-top: 2px solid color-mix(in srgb, var(--primary, #82aaff) 30%, transparent);
 }
 
 /* =========================================================
    User-Entered Cells
    ========================================================= */
 #sudoku .sudoku-cell.user-entered {
-  color: #82aaff; /* Tokyo Night primary blue */
+  color: var(--primary, #82aaff);
   font-weight: 600;
 }
 
@@ -113,41 +120,41 @@
    Active Cell Highlight (Navigation Mode)
    ========================================================= */
 #sudoku .sudoku-cell.active {
-  outline: 2px solid #82aaff; /* Tokyo Night blue */
+  outline: 2px solid var(--primary, #82aaff);
   outline-offset: -2px;
-  background: #3d4269;
+  background: color-mix(in srgb, var(--primary, #82aaff) 20%, var(--muted, #2f334d));
   box-shadow: 
-    0 0 8px rgba(130, 170, 255, 0.4),
-    0 0 12px rgba(130, 170, 255, 0.2),
-    inset 0 0 6px rgba(130, 170, 255, 0.15);
+    0 0 8px color-mix(in srgb, var(--primary, #82aaff) 40%, transparent),
+    0 0 12px color-mix(in srgb, var(--primary, #82aaff) 20%, transparent),
+    inset 0 0 6px color-mix(in srgb, var(--primary, #82aaff) 15%, transparent);
 }
 
 /* =========================================================
    Editing Cell Highlight (Edit Mode)
    ========================================================= */
 #sudoku .sudoku-cell.editing {
-  outline: 2px solid #ffc777; /* Tokyo Night yellow */
+  outline: 2px solid var(--accent, #ffc777);
   outline-offset: -2px;
-  background: #3d3836;
+  background: color-mix(in srgb, var(--accent, #ffc777) 15%, var(--muted, #2f334d));
   box-shadow: 
-    0 0 16px rgba(255, 199, 119, 0.7),
-    0 0 24px rgba(255, 199, 119, 0.4),
-    inset 0 0 12px rgba(255, 199, 119, 0.3);
+    0 0 16px color-mix(in srgb, var(--accent, #ffc777) 70%, transparent),
+    0 0 24px color-mix(in srgb, var(--accent, #ffc777) 40%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--accent, #ffc777) 30%, transparent);
   animation: editing-cell-glow 1.5s ease-in-out infinite;
 }
 
 @keyframes editing-cell-glow {
   0%, 100% {
     box-shadow: 
-      0 0 16px rgba(255, 199, 119, 0.7),
-      0 0 24px rgba(255, 199, 119, 0.4),
-      inset 0 0 12px rgba(255, 199, 119, 0.3);
+      0 0 16px color-mix(in srgb, var(--accent, #ffc777) 70%, transparent),
+      0 0 24px color-mix(in srgb, var(--accent, #ffc777) 40%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--accent, #ffc777) 30%, transparent);
   }
   50% {
     box-shadow: 
-      0 0 20px rgba(255, 199, 119, 0.9),
-      0 0 32px rgba(255, 199, 119, 0.6),
-      inset 0 0 16px rgba(255, 199, 119, 0.4);
+      0 0 20px color-mix(in srgb, var(--accent, #ffc777) 90%, transparent),
+      0 0 32px color-mix(in srgb, var(--accent, #ffc777) 60%, transparent),
+      inset 0 0 16px color-mix(in srgb, var(--accent, #ffc777) 40%, transparent);
   }
 }
 
@@ -158,16 +165,16 @@
 #sudoku .sudoku-cell.invalid-move {
   animation: sudoku-invalid-pulse 180ms ease-out;
   box-shadow:
-    0 0 12px rgba(255, 117, 127, 0.85),
-    0 0 24px rgba(255, 117, 127, 0.45);
+    0 0 12px color-mix(in srgb, var(--destructive, #c53b53) 85%, transparent),
+    0 0 24px color-mix(in srgb, var(--destructive, #c53b53) 45%, transparent);
 }
 
 @keyframes sudoku-invalid-pulse {
   0% {
     transform: scale(1.05);
     box-shadow:
-      0 0 16px rgba(255, 117, 127, 0.95),
-      0 0 28px rgba(255, 117, 127, 0.55);
+      0 0 16px color-mix(in srgb, var(--destructive, #c53b53) 95%, transparent),
+      0 0 28px color-mix(in srgb, var(--destructive, #c53b53) 55%, transparent);
   }
   100% {
     transform: none;
@@ -206,11 +213,59 @@
 
 /* Trail effect for moves */
 #sudoku .sudoku-cell.trail {
-  box-shadow: inset 0 0 6px rgba(130, 170, 255, 0.6), 0 0 6px rgba(130, 170, 255, 0.35);
+  box-shadow: 
+    inset 0 0 6px color-mix(in srgb, var(--primary, #82aaff) 60%, transparent), 
+    0 0 6px color-mix(in srgb, var(--primary, #82aaff) 35%, transparent);
   animation: sudoku-trail-fade 220ms ease-out;
 }
 
 @keyframes sudoku-trail-fade {
-  from { background-color: rgba(130, 170, 255, 0.25); }
+  from { background-color: color-mix(in srgb, var(--primary, #82aaff) 25%, transparent); }
   to   { background-color: transparent; }
+}
+
+/* Valid move flash */
+#sudoku .sudoku-cell.valid-move {
+  animation: sudoku-valid-flash 300ms ease-out;
+}
+
+@keyframes sudoku-valid-flash {
+  0% {
+    background: color-mix(in srgb, var(--success, #4fd6be) 40%, transparent);
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--success, #4fd6be) 80%, transparent),
+      0 0 20px color-mix(in srgb, var(--success, #4fd6be) 50%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--success, #4fd6be) 35%, transparent);
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Conflict highlighting */
+#sudoku .sudoku-cell.conflict {
+  outline: 2px solid var(--destructive, #c53b53);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--destructive, #c53b53) 25%, var(--muted, #2f334d));
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--destructive, #c53b53) 70%, transparent),
+    0 0 18px color-mix(in srgb, var(--destructive, #c53b53) 40%, transparent),
+    inset 0 0 8px color-mix(in srgb, var(--destructive, #c53b53) 30%, transparent);
+  animation: sudoku-conflict-pulse 1s ease-in-out infinite;
+}
+
+@keyframes sudoku-conflict-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px color-mix(in srgb, var(--destructive, #c53b53) 70%, transparent),
+      0 0 18px color-mix(in srgb, var(--destructive, #c53b53) 40%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--destructive, #c53b53) 30%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--destructive, #c53b53) 85%, transparent),
+      0 0 24px color-mix(in srgb, var(--destructive, #c53b53) 55%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--destructive, #c53b53) 40%, transparent);
+  }
 }

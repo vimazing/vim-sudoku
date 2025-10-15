@@ -78,21 +78,68 @@ export function useKeyBindings(ctx: Ctx) {
         return;
       }
 
-      // R or C to enter edit mode
-      if (k === "r" || k === "R" || k === "c" || k === "C") {
+      // R to replace (only works on user-filled cells)
+      if (k === "r" || k === "R") {
         recordKey(k);
         
-        // Check if current cell is a pre-filled clue (not editable)
         const cellIndex = ctx.cursor.r * 9 + ctx.cursor.c;
         const isClue = ctx.initialBoard[cellIndex] !== ".";
+        const isEmpty = ctx.board[cellIndex] === ".";
         
         if (isClue) {
-          // Flash red - cell is locked
+          // Flash red - cell is locked (pre-filled clue)
+          window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
+          return;
+        }
+        
+        if (isEmpty) {
+          // Flash red - cell is empty (use I to insert)
           window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
           return;
         }
         
         setEditMode("edit");
+        return;
+      }
+
+      // I to insert (only works on empty cells)
+      if (k === "i" || k === "I") {
+        recordKey(k);
+        
+        const cellIndex = ctx.cursor.r * 9 + ctx.cursor.c;
+        const isClue = ctx.initialBoard[cellIndex] !== ".";
+        const isEmpty = ctx.board[cellIndex] === ".";
+        
+        if (isClue) {
+          // Flash red - cell is locked (pre-filled clue)
+          window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
+          return;
+        }
+        
+        if (!isEmpty) {
+          // Flash red - cell already has a value (use R to replace)
+          window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
+          return;
+        }
+        
+        setEditMode("edit");
+        return;
+      }
+
+      // D or X to delete cell value in navigation mode
+      if (k === "d" || k === "D" || k === "x" || k === "X") {
+        recordKey(k);
+        
+        const cellIndex = ctx.cursor.r * 9 + ctx.cursor.c;
+        const isClue = ctx.initialBoard[cellIndex] !== ".";
+        
+        if (isClue) {
+          // Flash red - can't delete clues
+          window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
+          return;
+        }
+        
+        ctx.erase();
         return;
       }
 

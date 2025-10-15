@@ -3,8 +3,8 @@ import { useTimer } from "./hooks/useTimer";
 import { useScoreTime } from "./useScoreTime";
 import type { GameStatus } from "../types";
 
-const TIME_LIMIT_MS = 60000; // 60 seconds
-const KEYSTROKE_LIMIT = 100;
+const TIME_LIMIT_MS = Infinity; // No time limit by default
+const KEYSTROKE_LIMIT = Infinity; // No keystroke limit by default
 
 type GameScoreContext = {
   gameStatus: GameStatus;
@@ -14,33 +14,68 @@ type GameScoreContext = {
 type UseScoreParams = {
   gameContext: GameScoreContext;
   keystrokeCount: number;
+  board: string;
+  isComplete: (board: string) => boolean;
+  isFullyValid: (board: string) => boolean;
+  initialBoard: string;
 };
 
-export function useScore({ gameContext, keystrokeCount }: UseScoreParams) {
+export function useScore({
+  gameContext,
+  keystrokeCount,
+  board,
+  isComplete,
+  isFullyValid,
+  initialBoard
+}: UseScoreParams) {
   const timer = useTimer();
   const { gameStatus, setGameStatus } = gameContext;
   const { timeValue, startTimer, stopTimer, resetTimer } = timer;
 
   const [finalScore, setFinalScore] = useState<number | null>(null);
 
+  const minMovesRequired = initialBoard.split("").filter(c => c === ".").length;
+  const actualMoves = keystrokeCount;
+  const efficiency = minMovesRequired > 0
+    ? Math.round((actualMoves / minMovesRequired) * 100)
+    : 0;
+
   useScoreTime({ gameStatus, timer });
 
-  // Check for game-over conditions
   useEffect(() => {
     if (gameStatus !== "started") return;
 
-    // Time limit exceeded
+    if (isComplete(board) && isFullyValid(board)) {
+      setGameStatus("game-won");
+      return;
+    }
+
     if (timeValue >= TIME_LIMIT_MS) {
       setGameStatus("game-over");
       return;
     }
 
-    // Keystroke limit exceeded
     if (keystrokeCount >= KEYSTROKE_LIMIT) {
       setGameStatus("game-over");
       return;
     }
-  }, [gameStatus, timeValue, keystrokeCount, setGameStatus]);
+
+    // TODO: Enable efficiency-based game-over in future
+    // if (efficiency > 200) {
+    //   setGameStatus("game-over");
+    //   return;
+    // }
+  }, [gameStatus, timeValue, keystrokeCount, board, setGameStatus, isComplete, isFullyValid, efficiency]);
+
+  useEffect(() => {
+    const handleWin = () => {
+      if (gameStatus === "started") {
+        setGameStatus("game-won");
+      }
+    };
+    window.addEventListener("sudoku-game-won", handleWin);
+    return () => window.removeEventListener("sudoku-game-won", handleWin);
+  }, [gameStatus, setGameStatus]);
 
   useEffect(() => {
     if (gameStatus !== "game-won") return;
@@ -48,10 +83,12 @@ export function useScore({ gameContext, keystrokeCount }: UseScoreParams) {
     const timeInSeconds = timeValue / 1000;
     const baseScore = 100000;
     const timePenalty = Math.floor(timeInSeconds * 10);
-    const score = Math.max(0, baseScore - timePenalty);
+    const extraMoves = Math.max(0, actualMoves - minMovesRequired);
+    const movePenalty = extraMoves * 50;
+    const score = Math.max(0, baseScore - timePenalty - movePenalty);
 
     setFinalScore(score);
-  }, [gameStatus, timeValue]);
+  }, [gameStatus, timeValue, actualMoves, minMovesRequired]);
 
   return {
     timeValue,
@@ -61,6 +98,9 @@ export function useScore({ gameContext, keystrokeCount }: UseScoreParams) {
     finalScore,
     timeLimit: TIME_LIMIT_MS,
     keystrokeLimit: KEYSTROKE_LIMIT,
+    minMovesRequired,
+    actualMoves,
+    efficiency,
   };
 }
 

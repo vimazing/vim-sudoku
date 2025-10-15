@@ -1,21 +1,22 @@
 import { useEffect } from "react";
-import type { UseGameType } from "../../src/useGame/useGame";
+import type { UseGameType } from "../../src/";
 
 export const useKeyBindings = (gameManager: UseGameType) => {
   const { gameStatus, initGame, stopGame, clearLog, resetCount } = gameManager;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      console.log(e.key);
       // start game
-      if (e.key === "i" || e.key === "I") {
+      if (e.code === "Space") {
         if (["waiting", "game-over", "game-won"].includes(gameStatus)) {
           clearLog();
           resetCount();
           if (gameStatus === "game-over" || gameStatus === "game-won") {
             stopGame();
-            setTimeout(() => initGame(true), 0);
+            setTimeout(() => initGame(), 0);
           } else {
-            initGame(true);
+            initGame();
           }
           return;
         }
