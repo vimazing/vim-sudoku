@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useGame } from "../../src/useGame/useGame";
 import { useKeyBindings } from './useKeyBindings';
 import { useMounted } from './useMounted';
@@ -13,25 +14,32 @@ function formatTime(ms: number): string {
 
 export default function App() {
   const mounted = useMounted();
-  const { 
-    containerRef, 
-    initGame, 
-    solveBoard, 
+  const {
+    containerRef,
+    initGame,
+    solveBoard,
     scoreManager,
+    boardManager,
     keyLog,
     gameStatus,
   } = useGame(useKeyBindings);
 
   const { timeValue, finalScore } = scoreManager;
 
+  const stringed = boardManager.boardToString(true);
+
+  useEffect(() => {
+    console.log(stringed);
+  }, [stringed]);
+
   return (
     <div style={{ padding: 16 }}>
       <h1>VIMazing Sudoku</h1>
-      
+
       {/* Scoreboard */}
-      <div style={{ 
-        display: 'flex', 
-        gap: 32, 
+      <div style={{
+        display: 'flex',
+        gap: 32,
         marginBottom: 16,
         fontFamily: 'monospace',
         fontSize: 18,
@@ -53,7 +61,7 @@ export default function App() {
         <div ref={containerRef} />
         {mounted && <GameOverlay gameStatus={gameStatus} scoreManager={scoreManager} />}
       </div>
-      
+
       <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>
         <button onClick={initGame}>New Puzzle</button>
         <button onClick={solveBoard}>Solve</button>

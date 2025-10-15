@@ -41,6 +41,27 @@ export function useBoardState(cursorManager: UseCursorType) {
     }
   }, [board]);
 
+  const boardToString = useCallback((human: boolean = false) => {
+    // Computer-optimized: compact 81-character string
+    if (!human) {
+      return board;
+    }
+
+    // Human-readable: formatted grid with 3x3 box separators
+    let result = "";
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        const idx = r * 9 + c;
+        result += board[idx] === "." ? "." : board[idx];
+        if (c === 2 || c === 5) result += " | ";
+        else if (c < 8) result += " ";
+      }
+      result += "\n";
+      if (r === 2 || r === 5) result += "------+-------+------\n";
+    }
+    return result;
+  }, [board]);
+
   return {
     board,
     initialBoard,
@@ -49,6 +70,7 @@ export function useBoardState(cursorManager: UseCursorType) {
     erase,
     reset,
     solveBoard,
+    boardToString,
   };
 }
 
