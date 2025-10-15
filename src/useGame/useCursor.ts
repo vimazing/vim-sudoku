@@ -35,16 +35,21 @@ export function useCursor(rendererManager: UseRenderer) {
       if (animatingRef.current) return;
 
       setCursor((prev) => {
-        let r = prev.r;
-        let c = prev.c;
-        for (let i = 0; i < steps; i++) {
-          r = Math.max(0, Math.min(8, r + dr));
-          c = Math.max(0, Math.min(8, c + dc));
+        const targetR = prev.r + (dr * steps);
+        const targetC = prev.c + (dc * steps);
+
+        // Check if the full counted move would go out of bounds
+        if (targetR < 0 || targetR > 8 || targetC < 0 || targetC > 8) {
+          // Flash invalid and don't move
+          setTimeout(() => flashInvalid(), 0);
+          return prev;
         }
-        return { r, c };
+
+        // Valid move - apply it
+        return { r: targetR, c: targetC };
       });
     },
-    []
+    [flashInvalid]
   );
 
   useEffect(() => {

@@ -31,8 +31,16 @@
    ========================================================= */
 #sudoku .sudoku-grid {
   display: grid;
-  grid-template-columns: repeat(9, var(--cell-size));
-  gap: var(--grid-gap);
+  grid-template-columns: 
+    var(--cell-size) var(--cell-size) var(--cell-size)
+    var(--cell-size) var(--cell-size) var(--cell-size)
+    var(--cell-size) var(--cell-size) var(--cell-size);
+  grid-template-rows: 
+    var(--cell-size) var(--cell-size) var(--cell-size)
+    var(--cell-size) var(--cell-size) var(--cell-size)
+    var(--cell-size) var(--cell-size) var(--cell-size);
+  column-gap: var(--grid-gap);
+  row-gap: var(--grid-gap);
   user-select: none;
 }
 
@@ -57,16 +65,32 @@
 /* =========================================================
    3x3 Box Separators
    ========================================================= */
-/* Add extra margin to right of columns 2 and 5 (0-indexed) */
+/* Right borders (end of each 3x3 box horizontally) */
 #sudoku .sudoku-cell[data-c="2"],
-#sudoku .sudoku-cell[data-c="5"] {
-  margin-right: var(--box-separator);
+#sudoku .sudoku-cell[data-c="5"],
+#sudoku .sudoku-cell[data-c="8"] {
+  border-right: 2px solid rgba(130, 170, 255, 0.3);
 }
 
-/* Add extra margin to bottom of rows 2 and 5 (0-indexed) */
+/* Left borders (start of each 3x3 box horizontally) */
+#sudoku .sudoku-cell[data-c="0"],
+#sudoku .sudoku-cell[data-c="3"],
+#sudoku .sudoku-cell[data-c="6"] {
+  border-left: 2px solid rgba(130, 170, 255, 0.3);
+}
+
+/* Bottom borders (end of each 3x3 box vertically) */
 #sudoku .sudoku-cell[data-r="2"],
-#sudoku .sudoku-cell[data-r="5"] {
-  margin-bottom: var(--box-separator);
+#sudoku .sudoku-cell[data-r="5"],
+#sudoku .sudoku-cell[data-r="8"] {
+  border-bottom: 2px solid rgba(130, 170, 255, 0.3);
+}
+
+/* Top borders (start of each 3x3 box vertically) */
+#sudoku .sudoku-cell[data-r="0"],
+#sudoku .sudoku-cell[data-r="3"],
+#sudoku .sudoku-cell[data-r="6"] {
+  border-top: 2px solid rgba(130, 170, 255, 0.3);
 }
 
 /* =========================================================
