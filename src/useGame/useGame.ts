@@ -4,6 +4,7 @@ import { useCursor } from "./useCursor";
 import { useGameStatus } from "./useGameStatus";
 import { useBoardState } from "./useBoardState";
 import { useKeyBindings } from "./useKeyBindings";
+import { useScore } from "../useScore";
 
 export function useGame(platformHook?: unknown) {
   const rendererManager = useRenderer();
@@ -14,6 +15,10 @@ export function useGame(platformHook?: unknown) {
   const { gameStatus, setGameStatus, startGame, stopGame } = gameManager;
   const boardManager = useBoardState(cursorManager);
   const { board, initialBoard, solution, setDigit, erase, reset, solveBoard } = boardManager;
+
+  const scoreManager = useScore({
+    gameContext: { gameStatus, setGameStatus },
+  });
 
   // ---------------------------
   // Keybindings
@@ -80,6 +85,9 @@ export function useGame(platformHook?: unknown) {
     erase,
     reset,
     solveBoard,
+
+    // scoring
+    scoreManager,
 
     // keybindings (vim-maze compatible)
     ...keyBindings,

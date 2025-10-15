@@ -1,5 +1,8 @@
 import { useGame } from "./useGame";
+import { useScore } from "./useScore";
+
 export type UseGameType = ReturnType<typeof useGame>;
+export type UseScoreType = ReturnType<typeof useScore>;
 
 export type {
   Difficulty,
