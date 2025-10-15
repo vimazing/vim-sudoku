@@ -8,7 +8,7 @@
 
 Lightweight, typed **React hooks** and utilities for building interactive sudoku games with **VIM-style modal editing**.
 
-Part of the [VIMazing](https://github.com/andrepadez/vimazing-vimaze) project.
+Part of the [VIMazing](https://vimazing.com) project - [GitHub](https://github.com/andrepadez/vimazing-vimaze).
 
 ---
 
