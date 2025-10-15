@@ -1,6 +1,6 @@
 {
   "name": "@vimazing/vim-sudoku",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "VIMazing VIM Sudoku engine — a lightweight, typed React hook set for sudoku games.",
   "author": "André Padez <andre.padez@gmail.com>",
   "repository": {
