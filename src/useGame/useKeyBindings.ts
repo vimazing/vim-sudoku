@@ -1,15 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 
 export type KeyLogEntry = { key: string; timestamp: number };
+export type EditMode = "navigation" | "edit";
 
 type Ctx = {
   moveCursor: (dr: number, dc: number, steps?: number) => void;
   setDigit: (d: string) => void;
   erase: () => void;
+  stopGame: () => void;
+  cursor: { r: number; c: number };
+  board: string;
+  initialBoard: string;
 };
 
 export function useKeyBindings(ctx: Ctx) {
   const [keyLog, setKeyLog] = useState<KeyLogEntry[]>([]);
+  const [editMode, setEditMode] = useState<EditMode>("navigation");
   const logRef = useRef<KeyLogEntry[]>([]);
   const countRef = useRef<string>(""); // Vim-style numeric prefix
   const lastMotionRef = useRef<{ dr: number; dc: number; steps: number } | null>(null);
@@ -36,30 +42,75 @@ export function useKeyBindings(ctx: Ctx) {
     const onKeyDown = (e: KeyboardEvent) => {
       const k = e.key;
 
-      // --- Digits 1–9 fill a cell ---
-      if (/^[1-9]$/.test(k)) {
+      // ========== EDIT MODE ==========
+      if (editMode === "edit") {
+        // Exit edit mode with Escape or Enter
+        if (k === "Escape" || k === "Enter") {
+          recordKey(k);
+          setEditMode("navigation");
+          return;
+        }
+
+        // Digits 1-9 set the cell value
+        if (/^[1-9]$/.test(k)) {
+          recordKey(k);
+          ctx.setDigit(k);
+          return;
+        }
+
+        // Erase with x or Backspace
+        if (k === "x" || k === "Backspace") {
+          recordKey(k);
+          ctx.erase();
+          return;
+        }
+
+        // Ignore all other keys in edit mode
+        return;
+      }
+
+      // ========== NAVIGATION MODE ==========
+      
+      // Q to quit game
+      if (k === "q" || k === "Q") {
         recordKey(k);
-        ctx.setDigit(k);
+        ctx.stopGame();
+        return;
+      }
+
+      // R or C to enter edit mode
+      if (k === "r" || k === "R" || k === "c" || k === "C") {
+        recordKey(k);
+        
+        // Check if current cell is a pre-filled clue (not editable)
+        const cellIndex = ctx.cursor.r * 9 + ctx.cursor.c;
+        const isClue = ctx.initialBoard[cellIndex] !== ".";
+        
+        if (isClue) {
+          // Flash red - cell is locked
+          window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
+          return;
+        }
+        
+        setEditMode("edit");
+        return;
+      }
+
+      // Escape cancels count prefix
+      if (k === "Escape") {
+        recordKey(k);
         resetCount();
         return;
       }
 
-      // --- Erase ---
-      if (k === "x" || k === "Backspace") {
-        recordKey(k);
-        ctx.erase();
-        resetCount();
-        return;
-      }
-
-      // --- Numeric prefixes ---
-      if (/^[0-9]$/.test(k)) {
+      // Numeric prefixes (for counted motions)
+      if (/^[0-9]$/.test(k) && k !== "0") {
         recordKey(k);
         countRef.current += k;
         return;
       }
 
-      // --- Vim-style navigation ---
+      // Vim-style navigation
       let dr = 0;
       let dc = 0;
       if (k === "h") dc = -1;
@@ -98,7 +149,7 @@ export function useKeyBindings(ctx: Ctx) {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [ctx]);
+  }, [ctx, editMode]);
 
   // ✅ same interface as vim-maze useKeyBindings
   return {
@@ -108,6 +159,7 @@ export function useKeyBindings(ctx: Ctx) {
     resetCount,
     countRef,
     lastMotionRef,
+    editMode,
   };
 }
 

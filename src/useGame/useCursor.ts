@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import type { UseRenderer } from "./useSudokuRenderer";
 
 export function useCursor(rendererManager: UseRenderer) {
@@ -23,6 +23,13 @@ export function useCursor(rendererManager: UseRenderer) {
     setTimeout(() => el.classList.remove("invalid-move"), 180);
   }, [cursor, getCellEl]);
 
+  const flashLocked = useCallback(() => {
+    const el = getCellEl(cursor.r, cursor.c);
+    if (!el) return;
+    el.classList.add("locked-cell");
+    setTimeout(() => el.classList.remove("locked-cell"), 300);
+  }, [cursor, getCellEl]);
+
   const moveCursor = useCallback(
     (dr: number, dc: number, steps = 1) => {
       if (animatingRef.current) return;
@@ -39,6 +46,12 @@ export function useCursor(rendererManager: UseRenderer) {
     },
     []
   );
+
+  useEffect(() => {
+    const onLockedCell = () => flashLocked();
+    window.addEventListener("sudoku-locked-cell", onLockedCell);
+    return () => window.removeEventListener("sudoku-locked-cell", onLockedCell);
+  }, [flashLocked]);
 
   return {
     cursor,

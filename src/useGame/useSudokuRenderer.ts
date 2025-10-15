@@ -60,7 +60,7 @@ export function useRenderer() {
     container.appendChild(sudokuDiv);
   }, []);
 
-  const highlightCursor = useCallback((r: number, c: number) => {
+  const highlightCursor = useCallback((r: number, c: number, isEditing = false) => {
     const container = containerRef.current;
     if (!container) return;
     
@@ -68,11 +68,15 @@ export function useRenderer() {
     if (!sudokuDiv) return;
 
     sudokuDiv.querySelectorAll(".active").forEach((el) => el.classList.remove("active"));
+    sudokuDiv.querySelectorAll(".editing").forEach((el) => el.classList.remove("editing"));
     
     const selector = `.sudoku-cell[data-r="${r}"][data-c="${c}"]`;
     const cell = sudokuDiv.querySelector(selector);
     if (cell) {
       cell.classList.add("active");
+      if (isEditing) {
+        cell.classList.add("editing");
+      }
     }
   }, []);
 

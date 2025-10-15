@@ -57,18 +57,16 @@
 /* =========================================================
    3x3 Box Separators
    ========================================================= */
-/* Add thicker border to right of columns 2 and 5 (0-indexed) */
+/* Add extra margin to right of columns 2 and 5 (0-indexed) */
 #sudoku .sudoku-cell[data-c="2"],
 #sudoku .sudoku-cell[data-c="5"] {
-  border-right: var(--box-separator) solid #1e2030;
-  margin-right: 1px;
+  margin-right: var(--box-separator);
 }
 
-/* Add thicker border to bottom of rows 2 and 5 (0-indexed) */
+/* Add extra margin to bottom of rows 2 and 5 (0-indexed) */
 #sudoku .sudoku-cell[data-r="2"],
 #sudoku .sudoku-cell[data-r="5"] {
-  border-bottom: var(--box-separator) solid #1e2030;
-  margin-bottom: 1px;
+  margin-bottom: var(--box-separator);
 }
 
 /* =========================================================
@@ -80,20 +78,33 @@
 }
 
 /* =========================================================
-   Active Cell Highlight
+   Active Cell Highlight (Navigation Mode)
    ========================================================= */
 #sudoku .sudoku-cell.active {
-  outline: 2px solid #ffc777; /* Tokyo Night yellow/warning */
+  outline: 2px solid #82aaff; /* Tokyo Night blue */
+  outline-offset: -2px;
+  background: #3d4269;
+  box-shadow: 
+    0 0 8px rgba(130, 170, 255, 0.4),
+    0 0 12px rgba(130, 170, 255, 0.2),
+    inset 0 0 6px rgba(130, 170, 255, 0.15);
+}
+
+/* =========================================================
+   Editing Cell Highlight (Edit Mode)
+   ========================================================= */
+#sudoku .sudoku-cell.editing {
+  outline: 2px solid #ffc777; /* Tokyo Night yellow */
   outline-offset: -2px;
   background: #3d3836;
   box-shadow: 
     0 0 16px rgba(255, 199, 119, 0.7),
     0 0 24px rgba(255, 199, 119, 0.4),
     inset 0 0 12px rgba(255, 199, 119, 0.3);
-  animation: active-cell-glow 1.5s ease-in-out infinite;
+  animation: editing-cell-glow 1.5s ease-in-out infinite;
 }
 
-@keyframes active-cell-glow {
+@keyframes editing-cell-glow {
   0%, 100% {
     box-shadow: 
       0 0 16px rgba(255, 199, 119, 0.7),
@@ -128,6 +139,35 @@
   }
   100% {
     transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Locked cell effect (pre-filled clues) */
+#sudoku .sudoku-cell.locked-cell {
+  animation: sudoku-locked-pulse 300ms ease-out;
+}
+
+@keyframes sudoku-locked-pulse {
+  0% {
+    transform: scale(1.08);
+    background: rgba(255, 85, 85, 0.3);
+    box-shadow:
+      0 0 20px rgba(255, 85, 85, 0.9),
+      0 0 32px rgba(255, 85, 85, 0.6),
+      inset 0 0 16px rgba(255, 85, 85, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    background: rgba(255, 85, 85, 0.2);
+    box-shadow:
+      0 0 16px rgba(255, 85, 85, 0.8),
+      0 0 28px rgba(255, 85, 85, 0.5),
+      inset 0 0 12px rgba(255, 85, 85, 0.3);
+  }
+  100% {
+    transform: none;
+    background: transparent;
     box-shadow: none;
   }
 }

@@ -16,6 +16,21 @@ export function useGame(platformHook?: unknown) {
   const { board, initialBoard, solution, setDigit, erase, reset, solveBoard } = boardManager;
 
   // ---------------------------
+  // Keybindings
+  // ---------------------------
+  const keyBindings = useKeyBindings({
+    moveCursor,
+    setDigit,
+    erase,
+    stopGame,
+    cursor,
+    board,
+    initialBoard,
+  });
+  
+  const { editMode } = keyBindings;
+
+  // ---------------------------
   // Rendering
   // ---------------------------
   useEffect(() => {
@@ -27,18 +42,9 @@ export function useGame(platformHook?: unknown) {
       renderEmptyBoard();
     } else {
       renderBoard(board, initialBoard);
-      highlightCursor(cursor.r, cursor.c);
+      highlightCursor(cursor.r, cursor.c, editMode === "edit");
     }
-  }, [gameStatus, board, initialBoard, cursor, renderEmptyBoard, renderBoard, highlightCursor]);
-
-  // ---------------------------
-  // Keybindings
-  // ---------------------------
-  const keyBindings = useKeyBindings({
-    moveCursor,
-    setDigit,
-    erase,
-  });
+  }, [gameStatus, board, initialBoard, cursor, editMode, renderEmptyBoard, renderBoard, highlightCursor]);
 
   // ---------------------------
   // Game Control
