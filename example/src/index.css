@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+:root {
+  --sudoku-size-multiplier: 3;
+}

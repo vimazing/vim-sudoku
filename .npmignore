@@ -1,6 +1,12 @@
 src/
+example/
 node_modules/
 tsconfig.json
 bun.lockb
 *.log
-
+.git
+.gitignore
+NPM_PUBLISHING_CHECKLIST.md
+vim_sudoku_implementation.md
+vim_sudoku_game_mechanics.md
+vimazing-vim-sudoku-*.tgz

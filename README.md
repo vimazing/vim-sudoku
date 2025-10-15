@@ -1,5 +1,11 @@
 # @vimazing/vim-sudoku
 
+[![npm version](https://img.shields.io/npm/v/@vimazing/vim-sudoku.svg)](https://www.npmjs.com/package/@vimazing/vim-sudoku)
+[![npm downloads](https://img.shields.io/npm/dm/@vimazing/vim-sudoku.svg)](https://www.npmjs.com/package/@vimazing/vim-sudoku)
+[![license](https://img.shields.io/npm/l/@vimazing/vim-sudoku.svg)](https://github.com/vimazing/vim-sudoku/blob/main/LICENSE)
+
+![VIM Sudoku Demo](./vim-sudoku.gif)
+
 Lightweight, typed **React hooks** and utilities for building interactive sudoku games with **VIM-style modal editing**.
 
 Part of the [VIMazing](https://github.com/andrepadez/vimazing-vimaze) project.
@@ -146,9 +152,14 @@ Jump to end:    Press $
 
 ## Core Hooks
 
-### `useGame(platformHook?)`
+### `useGame(platformHook?, options?)`
 
-Main hook that orchestrates the entire sudoku game. Returns:
+Main hook that orchestrates the entire sudoku game.
+
+**Options:**
+- `validateMoves?: boolean` (default: `false`) - Enable real-time move validation with conflict detection. When `false`, allows harder gameplay without immediate feedback.
+
+**Returns:**
 
 ```ts
 {
@@ -201,10 +212,16 @@ import { useBoardState } from "@vimazing/vim-sudoku/useGame/useBoardState";
 
 ### Scoring
 
-Time-based scoring formula:
+Scoring formula with time and move penalties:
 ```
-score = max(0, 100000 - timeInSeconds × 10)
+score = max(0, 100000 - timeInSeconds × 10 - extraMoves × 50)
 ```
+
+Where:
+- `baseScore = 100000`
+- `timePenalty = timeInSeconds × 10`
+- `extraMoves = actualKeystrokes - minMovesRequired`
+- `movePenalty = extraMoves × 50`
 
 ### Game Over Conditions
 
@@ -219,7 +236,13 @@ const KEYSTROKE_LIMIT = 100;
 
 ### Win Detection
 
-Currently manual (solving via UI or `solveBoard()`). Automatic win detection coming soon!
+Automatic win detection is fully implemented using an efficient sum-to-45 algorithm:
+- Validates when board is complete (no empty cells)
+- Checks all rows sum to 45 (1+2+...+9)
+- Checks all columns sum to 45
+- Checks all 3x3 boxes sum to 45
+
+Manual win trigger available via `solveBoard()` for testing.
 
 ### Board Format
 

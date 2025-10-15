@@ -5,6 +5,10 @@ bower_components/
 # Build outputs
 dist/
 
+# npm package tarballs
+*.tgz
+vimazing-vim-sudoku-*.tgz
+
 # TypeScript
 *.tsbuildinfo
 

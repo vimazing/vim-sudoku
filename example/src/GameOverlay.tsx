@@ -25,21 +25,24 @@ export const GameOverlay = ({ gameStatus, scoreManager }: GameOverlayProps) => {
 export const GameWaitingContent = () => {
   return (
     <div
-      className="text-[#c8d3f5] text-[2em] font-mono text-center select-none"
-      style={{ textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)" }}
+      className="text-[#c8d3f5] font-mono text-center select-none"
+      style={{ 
+        textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)",
+        fontSize: "calc(2rem * var(--sudoku-size-multiplier))"
+      }}
     >
-      <div className="flex flex-col gap-10">
-        <p className="text-[3rem]">Press <strong className="text-[#82aaff]">New Puzzle</strong> to start</p>
-        <div className="text-[1.2em]">
-          <p className="mb-4"><strong className="text-[#ffc777]">Navigation Mode</strong> (default):</p>
+      <div className="flex flex-col" style={{ gap: "calc(2.5rem * var(--sudoku-size-multiplier))" }}>
+        <p style={{ fontSize: "calc(3rem * var(--sudoku-size-multiplier))" }}>Press <strong className="text-[#82aaff]">New Puzzle</strong> to start</p>
+        <div style={{ fontSize: "calc(1.2rem * var(--sudoku-size-multiplier))" }}>
+          <p style={{ marginBottom: "calc(1rem * var(--sudoku-size-multiplier))" }}><strong className="text-[#ffc777]">Navigation Mode</strong> (default):</p>
           <p><strong className="text-[#82aaff]">h</strong>,<strong className="text-[#82aaff]">j</strong>,<strong className="text-[#82aaff]">k</strong>,<strong className="text-[#82aaff]">l</strong> to move around</p>
-          <p className="mt-2"><strong className="text-[#82aaff]">R</strong> or <strong className="text-[#82aaff]">C</strong> to enter edit mode</p>
+          <p style={{ marginTop: "calc(0.5rem * var(--sudoku-size-multiplier))" }}><strong className="text-[#82aaff]">R</strong> or <strong className="text-[#82aaff]">C</strong> to enter edit mode</p>
           
-          <p className="mt-6 mb-4"><strong className="text-[#ffc777]">Edit Mode</strong>:</p>
+          <p style={{ marginTop: "calc(1.5rem * var(--sudoku-size-multiplier))", marginBottom: "calc(1rem * var(--sudoku-size-multiplier))" }}><strong className="text-[#ffc777]">Edit Mode</strong>:</p>
           <p>Type <strong className="text-[#82aaff]">1-9</strong> to fill cell</p>
-          <p className="mt-2"><strong className="text-[#82aaff]">Esc</strong> or <strong className="text-[#82aaff]">Enter</strong> to exit edit mode</p>
+          <p style={{ marginTop: "calc(0.5rem * var(--sudoku-size-multiplier))" }}><strong className="text-[#82aaff]">Esc</strong> or <strong className="text-[#82aaff]">Enter</strong> to exit edit mode</p>
           
-          <p className="mt-6 text-[0.8em] text-[#828bb8]">
+          <p className="text-[#828bb8]" style={{ marginTop: "calc(1.5rem * var(--sudoku-size-multiplier))", fontSize: "calc(0.8rem * var(--sudoku-size-multiplier))" }}>
             Try vim motions: <strong className="text-[#82aaff]">$</strong>, <strong className="text-[#82aaff]">^</strong>, <strong className="text-[#82aaff]">0</strong>, counted moves
           </p>
         </div>
@@ -53,13 +56,17 @@ export const GameWonContent = ({ scoreManager }: { scoreManager: UseScoreType })
 
   return (
     <div
-      className="text-[#c8d3f5] text-[2em] grid gap-4 font-mono uppercase text-center select-none"
-      style={{ textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)" }}
+      className="text-[#c8d3f5] grid font-mono uppercase text-center select-none"
+      style={{ 
+        textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)",
+        fontSize: "calc(2rem * var(--sudoku-size-multiplier))",
+        gap: "calc(1rem * var(--sudoku-size-multiplier))"
+      }}
     >
       <p className="text-[#c3e88d]">🎉 Puzzle Solved!</p>
       <p>Final Score:</p>
-      <p className="text-[#82aaff] text-[2.5em]">{finalScore.toLocaleString()}</p>
-      <p className="text-[#828bb8] text-[0.65em] normal-case">
+      <p className="text-[#82aaff]" style={{ fontSize: "calc(2.5rem * var(--sudoku-size-multiplier))" }}>{finalScore.toLocaleString()}</p>
+      <p className="text-[#828bb8] normal-case" style={{ fontSize: "calc(0.65rem * var(--sudoku-size-multiplier))" }}>
         <span className="text-[#c099ff]">max</span>
         <span className="text-[#c8d3f5]">(</span>
         <span className="text-[#ff966c]">0</span>
@@ -82,8 +89,8 @@ export const GameOverContent = () => {
       className="text-[#ff757f] font-mono uppercase text-center select-none"
       style={{ textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)" }}
     >
-      <p className="text-[5em]">Game Over</p>
-      <p className="text-[2em] text-[#828bb8]">Press <strong className="text-[#ffc777] normal-case">i</strong> to play again</p>
+      <p style={{ fontSize: "calc(5rem * var(--sudoku-size-multiplier))" }}>Game Over</p>
+      <p className="text-[#828bb8]" style={{ fontSize: "calc(2rem * var(--sudoku-size-multiplier))" }}>Press <strong className="text-[#ffc777] normal-case">i</strong> to play again</p>
     </div>
   );
 };

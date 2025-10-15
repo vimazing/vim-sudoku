@@ -20,11 +20,14 @@ export const MobileGameOverlay = ({ gameStatus, scoreManager }: MobileGameOverla
 export const GameWaitingContent = () => {
   return (
     <div
-      className="text-[#c8d3f5] text-[1em] font-mono text-center select-none"
-      style={{ textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)" }}
+      className="text-[#c8d3f5] font-mono text-center select-none"
+      style={{ 
+        textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)",
+        fontSize: "calc(1rem * var(--sudoku-size-multiplier))"
+      }}
     >
-      <div className="flex flex-col gap-3">
-        <p className="text-[1.5rem]">Tap New Puzzle to start</p>
+      <div className="flex flex-col" style={{ gap: "calc(0.75rem * var(--sudoku-size-multiplier))" }}>
+        <p style={{ fontSize: "calc(1.5rem * var(--sudoku-size-multiplier))" }}>Tap New Puzzle to start</p>
         <p>VIM motions available <br /> via on-screen keyboard</p>
       </div>
     </div>
@@ -36,13 +39,17 @@ export const GameWonContent = ({ scoreManager }: { scoreManager: UseScoreType })
 
   return (
     <div
-      className="text-[#c8d3f5] text-[1em] grid gap-4 font-mono uppercase text-center select-none"
-      style={{ textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)" }}
+      className="text-[#c8d3f5] grid font-mono uppercase text-center select-none"
+      style={{ 
+        textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)",
+        fontSize: "calc(1rem * var(--sudoku-size-multiplier))",
+        gap: "calc(1rem * var(--sudoku-size-multiplier))"
+      }}
     >
       <p className="text-[#c3e88d]">🎉 Solved!</p>
       <p>Final Score:</p>
-      <p className="text-[#82aaff] text-[2.5em]">{finalScore.toLocaleString()}</p>
-      <p className="text-[#828bb8] text-[0.65em] normal-case">
+      <p className="text-[#82aaff]" style={{ fontSize: "calc(2.5rem * var(--sudoku-size-multiplier))" }}>{finalScore.toLocaleString()}</p>
+      <p className="text-[#828bb8] normal-case" style={{ fontSize: "calc(0.65rem * var(--sudoku-size-multiplier))" }}>
         <span className="text-[#c099ff]">max</span>
         <span className="text-[#c8d3f5]">(</span>
         <span className="text-[#ff966c]">0</span>
@@ -62,8 +69,11 @@ export const GameWonContent = ({ scoreManager }: { scoreManager: UseScoreType })
 export const GameOverContent = () => {
   return (
     <div
-      className="text-[#ff757f] text-[5em] font-mono uppercase text-center select-none"
-      style={{ textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)" }}
+      className="text-[#ff757f] font-mono uppercase text-center select-none"
+      style={{ 
+        textShadow: "2px 2px 4px rgba(27, 29, 43, 0.9)",
+        fontSize: "calc(5rem * var(--sudoku-size-multiplier))"
+      }}
     >
       Game Over
     </div>

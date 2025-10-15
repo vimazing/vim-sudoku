@@ -7,7 +7,6 @@ export type UseScoreType = ReturnType<typeof useScore>;
 export type {
   Difficulty,
   DifficultyName,
-  BoardString,
 } from "./lib/Sudoku";
 
 export type GamePhase = "idle" | "playing";

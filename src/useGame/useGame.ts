@@ -6,14 +6,19 @@ import { useBoardState } from "./useBoardState";
 import { useKeyBindings } from "./useKeyBindings";
 import { useScore } from "../useScore";
 
-export function useGame(platformHook?: unknown) {
+export type UseGameOptions = {
+  validateMoves?: boolean;
+};
+
+export function useGame(platformHook?: unknown, options?: UseGameOptions) {
+  const { validateMoves = false } = options || {};
   const rendererManager = useRenderer();
   const { containerRef, renderEmptyBoard, renderBoard, highlightCursor } = rendererManager;
   const cursorManager = useCursor(rendererManager);
   const { cursor, moveCursor } = cursorManager;
   const gameManager = useGameStatus(rendererManager, cursorManager);
   const { gameStatus, setGameStatus, startGame, stopGame } = gameManager;
-  const boardManager = useBoardState(cursorManager);
+  const boardManager = useBoardState(cursorManager, { validateMoves });
   const { 
     board, 
     initialBoard, 

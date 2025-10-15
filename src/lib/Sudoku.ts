@@ -51,11 +51,14 @@ function initialize() {
 // ---------------------------------------------------------------------------
 
 sudoku.generate = function (difficulty: Difficulty, unique?: boolean): string {
+  let numericDifficulty: number;
   if (typeof difficulty === "string" || typeof difficulty === "undefined") {
-    difficulty = DIFFICULTY[difficulty as DifficultyName] || DIFFICULTY.easy;
+    numericDifficulty = DIFFICULTY[difficulty as DifficultyName] || DIFFICULTY.easy;
+  } else {
+    numericDifficulty = difficulty;
   }
 
-  difficulty = sudoku._force_range(difficulty, NR_SQUARES + 1, MIN_GIVENS);
+  numericDifficulty = sudoku._force_range(numericDifficulty, NR_SQUARES + 1, MIN_GIVENS);
   unique = unique ?? true;
 
   const blank_board = sudoku.BLANK_BOARD;
@@ -74,7 +77,7 @@ sudoku.generate = function (difficulty: Difficulty, unique?: boolean): string {
     }
 
     if (
-      single_candidates.length >= difficulty &&
+      single_candidates.length >= numericDifficulty &&
       sudoku._strip_dups(single_candidates).length >= 8
     ) {
       let board = "";
@@ -90,9 +93,9 @@ sudoku.generate = function (difficulty: Difficulty, unique?: boolean): string {
         }
       }
 
-      if (givens_idxs.length > difficulty) {
+      if (givens_idxs.length > numericDifficulty) {
         givens_idxs = sudoku._shuffle(givens_idxs);
-        for (let i = 0; i < givens_idxs.length - difficulty; ++i) {
+        for (let i = 0; i < givens_idxs.length - numericDifficulty; ++i) {
           const target = givens_idxs[i];
           board =
             board.substring(0, target) +
@@ -105,7 +108,7 @@ sudoku.generate = function (difficulty: Difficulty, unique?: boolean): string {
     }
   }
 
-  return sudoku.generate(difficulty);
+  return sudoku.generate(numericDifficulty);
 };
 
 // ---------------------------------------------------------------------------
@@ -187,12 +190,10 @@ sudoku._search = function (candidates: Record<string, string>, reverse: boolean)
   reverse = reverse || false;
 
   let max_nr_candidates = 0;
-  let max_square = "";
   for (const s of SQUARES) {
     const n = candidates[s].length;
     if (n > max_nr_candidates) {
       max_nr_candidates = n;
-      max_square = s;
     }
   }
   if (max_nr_candidates === 1) return candidates;

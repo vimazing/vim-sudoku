@@ -1,9 +1,14 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState } from "react";
 import { sudoku } from "../lib/Sudoku";
 import type { UseCursorType } from "./useCursor";
 
-export function useBoardState(cursorManager: UseCursorType) {
+type UseBoardStateOptions = {
+  validateMoves?: boolean;
+};
+
+export function useBoardState(cursorManager: UseCursorType, options?: UseBoardStateOptions) {
   const { cursor, setCursor } = cursorManager;
+  const { validateMoves = false } = options || {};
   const [board, setBoard] = useState<string>(sudoku.generate("medium"));
   const [initialBoard, setInitialBoard] = useState<string>(board);
   const [solution, setSolution] = useState<string | null>(null);
@@ -25,8 +30,6 @@ export function useBoardState(cursorManager: UseCursorType) {
 
   const isValidPlacement = (testBoard: string, row: number, col: number, digit: string): boolean => {
     if (digit === ".") return true;
-
-    const idx = row * 9 + col;
 
     for (let c = 0; c < 9; c++) {
       const checkIdx = row * 9 + c;
@@ -131,7 +134,7 @@ export function useBoardState(cursorManager: UseCursorType) {
   };
 
   const setDigit = (d: string) => {
-    const i = cursor.r * 9 + cursor.c;
+    const cellIndex = cursor.r * 9 + cursor.c;
 
     if (!canEditCell(cursor.r, cursor.c)) {
       window.dispatchEvent(new CustomEvent("sudoku-locked-cell"));
@@ -139,10 +142,10 @@ export function useBoardState(cursorManager: UseCursorType) {
     }
 
     const arr = board.split("");
-    arr[i] = d;
+    arr[cellIndex] = d;
     const newBoard = arr.join("");
 
-    if (!isValidPlacement(newBoard, cursor.r, cursor.c, d)) {
+    if (validateMoves && !isValidPlacement(newBoard, cursor.r, cursor.c, d)) {
       const conflicts = getConflicts(newBoard, cursor.r, cursor.c);
       window.dispatchEvent(
         new CustomEvent("sudoku-invalid-move", {
@@ -153,11 +156,13 @@ export function useBoardState(cursorManager: UseCursorType) {
     }
 
     setBoard(newBoard);
-    window.dispatchEvent(
-      new CustomEvent("sudoku-valid-move", {
-        detail: { row: cursor.r, col: cursor.c, digit: d },
-      })
-    );
+    if (validateMoves) {
+      window.dispatchEvent(
+        new CustomEvent("sudoku-valid-move", {
+          detail: { row: cursor.r, col: cursor.c, digit: d },
+        })
+      );
+    }
     return true;
   };
 
