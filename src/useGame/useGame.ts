@@ -16,10 +16,6 @@ export function useGame(platformHook?: unknown) {
   const boardManager = useBoardState(cursorManager);
   const { board, initialBoard, solution, setDigit, erase, reset, solveBoard } = boardManager;
 
-  const scoreManager = useScore({
-    gameContext: { gameStatus, setGameStatus },
-  });
-
   // ---------------------------
   // Keybindings
   // ---------------------------
@@ -33,7 +29,15 @@ export function useGame(platformHook?: unknown) {
     initialBoard,
   });
   
-  const { editMode } = keyBindings;
+  const { editMode, keyLog } = keyBindings;
+
+  // ---------------------------
+  // Scoring (needs keyLog from keyBindings)
+  // ---------------------------
+  const scoreManager = useScore({
+    gameContext: { gameStatus, setGameStatus },
+    keystrokeCount: keyLog.length,
+  });
 
   // ---------------------------
   // Rendering

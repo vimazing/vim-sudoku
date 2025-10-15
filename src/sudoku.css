@@ -8,6 +8,14 @@
   --box-separator: 3px;
 }
 
+
+:root {
+  --cell-size: 96px;
+  --cell-font-size: 48px;
+  --grid-gap: 6px;
+  --box-separator: 9px;
+}
+
 /* =========================================================
    Container & Grid Base
    ========================================================= */
